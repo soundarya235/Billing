@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMart - Smart POS Billing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    
+    <style>
+        /* 🆕 இன்-பில்ட் ஸ்கேனர் பட்டன்களை உங்க DMart தீமுக்கு ஏத்த மாதிரி மாத்துறோம் */
+        #interactive-reader button {
+            background-color: #1d4ed8 !important; /* Tailwind Blue-700 (Start Button) */
+            color: white !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem !important;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+            text-transform: uppercase !important;
+            border: none !important;
+            cursor: pointer !important;
+            margin: 8px auto !important;
+            display: inline-block !important;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #interactive-reader button:hover {
+            background-color: #1e40af !important; /* Blue-800 */
+        }
+        /* ஸ்டாப் பட்டன் மட்டும் சிவப்பாக மாற */
+        #interactive-reader button#html5-qrcode-button-camera-stop {
+            background-color: #dc2626 !important; /* Red-600 */
+        }
+        #interactive-reader button#html5-qrcode-button-camera-stop:hover {
+            background-color: #b91c1c !important; /* Red-700 */
+        }
+        #interactive-reader select {
+            padding: 0.375rem 0.5rem !important;
+            border-radius: 0.5rem !important;
+            border: 1px solid #d1d5db !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            color: #374151 !important;
+            background-color: #fff !important;
+            outline: none !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans flex">
+
+    <aside class="w-64 bg-green-800 text-white flex flex-col shadow-xl fixed h-full z-10">
+        <div class="p-5 text-2xl font-bold border-b border-green-700 flex items-center gap-2">🛒 DMart ERP</div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" class="block py-2.5 px-4 rounded hover:bg-green-700 font-bold transition">Dashboard</a>
+            <a href="billing.html" class="block py-2.5 px-4 rounded transition bg-green-900 opacity-75">POS Billing</a>
+            <a href="invoice.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Invoice History</a>
+            <a href="products.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Product Inventory</a>
+            
+            <a href="suppliers.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Suppliers List</a>
+            
+            <a href="reports.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+            <a href="settings.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+        </nav>
+    </aside>
+
+    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        <header class="bg-white p-4 shadow-sm border-b flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Smart Point of Sale (POS)</h1>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name:</label>
+                <input type="text" id="customer-name-input" value="Walk-in Customer" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 outline-none" placeholder="Enter customer name...">
+                </div>
+            <div id="bill-id-display" class="text-sm font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">Bill No: #...</div>
+        </header>
+
+        <main class="p-6 max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 space-y-6">
+                
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-md font-bold text-gray-700 flex items-center gap-2">📷 Live Camera Barcode Scanner</h3>
+                    </div>
+                    
+                    <div class="flex justify-center bg-gray-50 rounded-xl overflow-hidden border border-dashed border-gray-300 p-3">
+                        <div id="interactive-reader" class="w-full max-w-md border-0"></div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 text-center">💡 "Select Camera" and press the "Start Scanning" button and point the mobile barcode straight at it."</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">🔍 Search & Filter Products manually</label>
+                    <input type="text" id="filter-input" placeholder="Type product name or ID to search..." class="w-full border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    
+                    <div id="search-dropdown" class="absolute left-4 right-4 bg-white border rounded-lg shadow-xl mt-1 hidden max-h-48 overflow-y-auto z-20"></div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider border-b">
+                                <th class="p-4 text-center w-16">S.No</th>
+                                <th class="p-4">Product Name</th>
+                                <th class="p-4 text-center">GST %</th>
+                                <th class="p-4 text-center">GST Amt (₹)</th> 
+                                <th class="p-4 text-center">Unit Price</th>
+                                <th class="p-4 text-center">Qty</th>
+                                <th class="p-4 text-right">Total Amount</th>
+                                <th class="p-4 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bill-items-body" class="divide-y divide-gray-200 text-sm text-gray-700">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 space-y-4">
+                    <h3 class="text-md font-bold text-gray-700 border-b pb-3">Pricing Calculator</h3>
+                    
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Items Subtotal:</span>
+                            <span id="summary-subtotal" class="font-semibold text-gray-800">₹0.00</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span>Taxable Value:</span>
+                            <span id="summary-taxable" class="font-semibold text-gray-800">₹0.00</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span>Total CGST:</span>
+                            <span id="summary-cgst" class="font-semibold text-gray-800">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Total SGST:</span>
+                            <span id="summary-sgst" class="font-semibold text-gray-800">₹0.00</span>
+                        </div>
+
+                        <hr class="border-gray-100 my-2">
+
+                        <div class="flex justify-between items-center py-1 bg-yellow-50/50 p-2 rounded-lg border border-dashed border-yellow-200">
+                            <span class="font-medium text-amber-800">Auto Discount (%) :</span>
+                            <input type="number" id="discount-input" value="0" class="w-16 border p-1 rounded text-center font-bold text-gray-800 bg-gray-50 focus:outline-none" readonly>
+                        </div>
+
+                        <div class="flex justify-between text-red-500 px-2 text-sm">
+                            <span>Discount Amount Saved:</span>
+                            <span id="summary-discount-val">-₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-4 flex justify-between items-center">
+                        <span class="text-base font-bold text-gray-800">Grand Total:</span>
+                        <span id="summary-total" class="text-2xl font-black text-green-700">₹0.00</span>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <label class="text-xs font-bold text-gray-400 uppercase">Payment Method</label>
+                        <select id="payment-mode" class="w-full border p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 bg-white font-medium">
+                            <option value="Cash">💵 Cash Payment</option>
+                            <option value="UPI">📱 UPI / QR Code</option>
+                            <option value="Card">💳 Credit/Debit Card</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 space-y-2">
+                        <button id="btn-checkout" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded-xl transition shadow-md shadow-green-100">Complete & Save Bill</button>
+                        <button id="btn-clear" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold py-2 rounded-lg text-sm transition">Clear Bill Cart</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="Assets/js/storage.js"></script>
+    <script src="Assets/js/billing.js"></script>
+</body>
+</html>

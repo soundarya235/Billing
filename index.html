@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMart ERP - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans flex">
+
+    <aside class="w-64 bg-green-800 text-white flex flex-col shadow-xl fixed h-full z-10">
+        <div class="p-5 text-2xl font-bold border-b border-green-700 flex items-center gap-2">🛒 DMart ERP</div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" class="block py-2.5 px-4 rounded bg-green-900 font-bold transition">Dashboard</a>
+            <a href="billing.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">POS Billing</a>
+            <a href="invoice.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Invoice History</a>
+            <a href="products.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Product Inventory</a>
+            
+            <a href="suppliers.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Suppliers List</a>
+            
+            <a href="reports.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+            <a href="settings.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+
+        </nav>
+    </aside>
+
+    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        
+        <header class="bg-white p-4 shadow-sm border-b flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">🏪 DMart Store Management Dashboard</h1>
+            <div id="live-clock" class="text-sm font-mono text-gray-600 bg-gray-100 px-3 py-1 rounded-lg">Loading Time...</div>
+        </header>
+
+        <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Total Revenue</p>
+                        <h3 id="dash-revenue" class="text-2xl font-black text-gray-950 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg text-green-600 text-xl">💰</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Total Products</p>
+                        <h3 id="dash-products" class="text-2xl font-black text-gray-950 mt-1">0 Items</h3>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg text-blue-600 text-xl">📦</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Low Stock Alerts</p>
+                        <h3 id="dash-lowstock" class="text-2xl font-black text-red-600 mt-1">0 Items</h3>
+                    </div>
+                    <div id="dash-lowstock-box" class="p-3 bg-gray-50 rounded-lg text-xl">⚠️</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Active Suppliers</p>
+                        <h3 id="dash-suppliers" class="text-2xl font-black text-gray-950 mt-1">0 Active</h3>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-lg text-purple-600 text-xl">🚚</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between">
+                    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">📊 Stock Status Overview</h2>
+                    <div class="relative flex items-center justify-center h-56">
+                        <canvas id="stockPieChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between">
+                    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">🔥 Top Selling Products (Monthly)</h2>
+                    <div class="relative h-56">
+                        <canvas id="topSellingBarChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-red-50 border-b border-red-100 font-bold text-red-700 flex justify-between items-center">
+                    <span>⚠️ Stock Re-order Warning (உடனே ஆர்டர் செய்ய வேண்டியவை)</span>
+                    <span class="text-xs bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded uppercase">Urgent</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 uppercase text-xs font-bold border-b">
+                                <th class="p-3">SKU ID</th>
+                                <th class="p-3">Product Name</th>
+                                <th class="p-3">Current Stock</th>
+                                <th class="p-3">Supplier Info / Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-lowstock-table" class="divide-y divide-gray-100 text-gray-700">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // லைவ் வாட்ச் செட்டப்
+            setInterval(() => {
+                document.getElementById("live-clock").innerText = new Date().toLocaleString();
+            }, 1000);
+
+            // டேட்டாவை கணக்கிட்டு வரைபடங்களை உருவாக்கத் தொடங்குதல்
+            initDashboard();
+        });
+
+        function initDashboard() {
+            // லோக்கல் ஸ்டோரேஜ் தரவுகள்
+            const products = JSON.parse(localStorage.getItem("products")) || [];
+            const invoices = JSON.parse(localStorage.getItem("all_invoices")) || [];
+            const suppliers = JSON.parse(localStorage.getItem("all_suppliers")) || [];
+
+            // 1. எளிய கணக்கீடுகள் (Counters)
+            let totalRevenue = 0;
+            let productSalesMap = {};
+
+            invoices.forEach(inv => {
+                const amt = parseFloat(inv.grandTotal.replace(/[^\d.-]/g, '')) || 0;
+                totalRevenue += amt;
+
+                if (inv.items && Array.isArray(inv.items)) {
+                    inv.items.forEach(item => {
+                        if (!productSalesMap[item.name]) productSalesMap[item.name] = 0;
+                        productSalesMap[item.name] += item.quantity; // மொத்த எண்ணிக்கையைக் கூட்டுகிறது
+                    });
+                }
+            });
+
+            // 2. ஸ்டாக் நிலவரங்களை கணக்கிடுதல் (For Pie Chart)
+            let inStockCount = 0;
+            let lowStockCount = 0;
+            let outOfStockCount = 0;
+            let lowStockProducts = [];
+
+            products.forEach(p => {
+                const stockQty = parseInt(p.stock) || 0;
+                if (stockQty <= 0) {
+                    outOfStockCount++;
+                    lowStockProducts.push(p); // முற்றிலும் தீர்ந்ததும் எச்சரிக்கை பட்டியலில் வரும்
+                } else if (stockQty <= 15) {
+                    lowStockCount++;
+                    lowStockProducts.push(p); // லோ ஸ்டாக்கும் எச்சரிக்கையில் வரும்
+                } else {
+                    inStockCount++;
+                }
+            });
+
+            // 3. மேல் வரிசை கார்டுகளை அப்டேட் செய்தல்
+            document.getElementById("dash-revenue").innerText = `₹${totalRevenue.toFixed(2)}`;
+            document.getElementById("dash-products").innerText = `${products.length} Items`;
+            document.getElementById("dash-suppliers").innerText = `${suppliers.length} Active`;
+            document.getElementById("dash-lowstock").innerText = `${lowStockProducts.length} Items`;
+            
+            if(lowStockProducts.length > 0) {
+                document.getElementById("dash-lowstock-box").className = "p-3 bg-red-100 rounded-lg text-red-600 text-xl font-bold animate-pulse";
+            }
+
+            // 4. லோ ஸ்டாக் டேபிளை நிரப்புதல்
+            const tbody = document.getElementById("dash-lowstock-table");
+            if(lowStockProducts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-green-700 font-bold bg-green-50">✅ All product stocks are stable and safe!</td></tr>`;
+            } else {
+                tbody.innerHTML = lowStockProducts.map(p => `
+                    <tr class="hover:bg-red-50/50 transition">
+                        <td class="p-3 font-mono text-xs text-gray-500">${p.id}</td>
+                        <td class="p-3 font-bold text-gray-900">${p.name}</td>
+                        <td class="p-3 font-mono font-black ${p.stock <= 0 ? 'text-red-600' : 'text-orange-600'}">${p.stock <= 0 ? 'Out of Stock (0)' : p.stock + ' Nos left'}</td>
+                        <td class="p-3">
+                            <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-100">🚚 Supplier: ${p.supplier || 'N/A'}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // 5. 📊 RENDER CHARTS (வரைபடங்களை உருவாக்குதல்)
+            buildCharts(inStockCount, lowStockCount, outOfStockCount, productSalesMap);
+        }
+
+        function buildCharts(inStock, lowStock, outOfStock, productSales) {
+            // அ) STOCK STATUS OVERVIEW (Pie Chart)
+            const ctxPie = document.getElementById('stockPieChart').getContext('2d');
+            new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+                    datasets: [{
+                        data: [inStock, lowStock, outOfStock],
+                        backgroundColor: ['#22c55e', '#eab308', '#ef4444'], // பச்சை, மஞ்சள், சிவப்பு
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // ஆ) TOP SELLING PRODUCTS (Bar Chart)
+            // விற்பனைத் தரவை ஏறுவரிசையில் அடுக்கி முதல் 5 டாப் பொருட்களை மட்டும் எடுக்கிறோம்
+            const sortedProdNames = Object.keys(productSales).sort((a,b) => productSales[b] - productSales[a]).slice(0, 5);
+            const sortedProdQty = sortedProdNames.map(name => productSales[name]);
+
+            // ஒருவேளை விற்பனை எதுவும் இல்லை எனில் டமி டேட்டா காட்டும் (பார்ப்பதற்கு அழகாக இருக்க)
+            const chartLabels = sortedProdNames.length > 0 ? sortedProdNames : ['No Sales Yet'];
+            const chartData = sortedProdQty.length > 0 ? sortedProdQty : [0];
+
+            const ctxBar = document.getElementById('topSellingBarChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Quantity Sold (விற்ற எண்ணிக்கை)',
+                        data: chartData,
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'], // மல்டி கலர் பார்கள்
+                        borderRadius: 6,
+                        maxBarThickness: 35
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMart - Invoice Records</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* பிரிண்ட் எடுக்கும் போது பட்டன்கள் மற்றும் தேவையில்லாத பகுதிகளை மறைக்க */
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+            .print-area { box-shadow: none; border: none; max-width: 100%; width: 100%; padding: 0; margin: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans flex">
+
+    <aside class="w-64 bg-green-800 text-white flex flex-col shadow-xl fixed h-full z-10 no-print">
+        <div class="p-5 text-2xl font-bold border-b border-green-700 flex items-center gap-2">🛒 DMart ERP</div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" class="block py-2.5 px-4 rounded hover:bg-green-700 font-bold transition">Dashboard</a>
+            <a href="billing.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">POS Billing</a>
+            <a href="invoice.html" class="block py-2.5 px-4 rounded transition bg-green-900 opacity-75">Invoice History</a>
+            <a href="products.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Product Inventory</a>
+            
+            <a href="suppliers.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Suppliers List</a>
+            
+            <a href="reports.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+            <a href="settings.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+        </nav>
+    </aside>
+
+    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        
+        <header class="bg-white p-4 shadow-sm border-b flex justify-between items-center no-print">
+            <h1 class="text-xl font-bold text-gray-800">Invoice Management</h1>
+            <a href="billing.html" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded-lg text-sm transition flex items-center gap-1 shadow">
+                ➕ New Bill (POS)
+            </a>
+        </header>
+
+        <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+
+            <div id="invoice-list-container" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden no-print">
+                <div class="p-4 bg-gray-50 border-b">
+                    <h2 class="font-bold text-gray-700">📜 All Invoice History Records</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider border-b">
+                                <th class="p-4">Invoice No</th>
+                                <th class="p-4">Customer</th>
+                                <th class="p-4">Date</th>
+                                <th class="p-4 text-center">Items Qty</th>
+                                <th class="p-4 text-right">Total</th>
+                                <th class="p-4 text-center">Payment</th>
+                                <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-table-body" class="divide-y divide-gray-200 text-sm text-gray-700">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="bill-preview-container" class="hidden print-area max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-200 relative">
+                
+                <button onclick="closeBillPreview()" class="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold p-1.5 rounded-full no-print text-xs transition">
+                    ❌ Close View
+                </button>
+
+                <div class="text-center border-b pb-4">
+                    <h1 class="text-3xl font-black text-green-700 tracking-wide">🛒 DMART SUPERMARKET</h1>
+                    <p class="text-xs text-gray-400 mt-1">123, Main Bazaar Road, Chennai - 600001</p>
+                    <p class="text-xs text-gray-400">Phone: +91 98765 43210 | GSTIN: 33AAAAA0000A1Z5</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 my-6 text-sm">
+                    <div>
+                        <p class="text-gray-500">Invoice No: <span id="inv-id" class="font-bold text-gray-800">#0000</span></p>
+                        <p class="text-gray-500 mt-1">Customer: <span id="inv-customer" class="font-bold text-gray-800">Walk-in Customer</span></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-500">Date & Time:</p>
+                        <p id="inv-date" class="font-medium text-gray-800">-</p>
+                    </div>
+                </div>
+
+                <table class="w-full text-left border-collapse text-sm my-6">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200 bg-gray-50 text-gray-600 font-bold">
+                            <th class="py-2">Item Description</th>
+                            <th class="py-2 text-center">Qty</th>
+                            <th class="py-2 text-right">Price</th>
+                            <th class="py-2 text-center">GST</th>
+                            <th class="py-2 text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-items-body" class="divide-y divide-gray-100 text-gray-700">
+                    </tbody>
+                </table>
+
+                <div class="border-t pt-4 max-w-xs ml-auto space-y-2 text-sm text-gray-600">
+                    <div class="flex justify-between">
+                        <span>Items Subtotal:</span>
+                        <span id="inv-subtotal">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Taxable Value:</span>
+                        <span id="inv-taxable">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-400 pl-4">
+                        <span>CGST + SGST:</span>
+                        <span id="inv-gst-total">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-red-500 font-medium">
+                        <span>Discount Savings:</span>
+                        <span id="inv-discount">-₹0.00</span>
+                    </div>
+                    <div class="flex justify-between border-t-2 border-gray-200 pt-3 text-base font-black text-gray-900">
+                        <span>NET AMOUNT:</span>
+                        <span id="inv-total" class="text-xl text-green-700">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between pt-1">
+                        <span class="text-xs text-gray-400">Payment Method:</span>
+                        <span id="inv-payment" class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">-</span>
+                    </div>
+                </div>
+
+                <div class="text-center border-t pt-6 mt-8">
+                    <p class="font-bold text-gray-700 text-sm">🙏 Thank You! Visit Again 🙏</p>
+                    <p class="text-xs text-gray-400 mt-1">Goods once sold cannot be taken back or exchanged.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. லோக்கல் ஸ்டோரேஜில் இருந்து அனைத்து பழைய இன்வாய்ஸ்களையும் எடுக்கிறோம்
+            let savedInvoices = JSON.parse(localStorage.getItem("all_invoices")) || [];
+
+            // 2. பில்லிங் பக்கத்தில் இருந்து புது பில் வந்திருக்கிறதா என பார்க்கிறோம்
+            const latestInvoice = sessionStorage.getItem("latestInvoice");
+            
+            if (latestInvoice) {
+                const newInvoiceData = JSON.parse(latestInvoice);
+                
+                // டூப்ளிகேட் ஆகாமல் தடுக்க செக் செய்கிறோம்
+                const isAlreadySaved = savedInvoices.some(inv => inv.billNo === newInvoiceData.billNo);
+                
+                if (!isAlreadySaved) {
+                    // கஸ்டமர் பெயரை தற்காலிகமாக 'Walk-in Customer' அல்லது ரேண்டமாக வைக்கிறோம்
+                    newInvoiceData.customerName = ["Ravi", "Kumar", "Santhosh", "Anitha", "Walk-in"][Math.floor(Math.random() * 5)];
+                    
+                    // புது பில்லை லிஸ்டின் முதலில் சேர்க்கிறோம்
+                    savedInvoices.unshift(newInvoiceData);
+                    localStorage.setItem("all_invoices", JSON.stringify(savedInvoices));
+                }
+                
+                // லோடு ஆன பிறகு sessionStorage-ஐ கிளியர் செய்கிறோம்
+                sessionStorage.removeItem("latestInvoice");
+
+                // புது பில் வந்தவுடன் அதை தானாக ஸ்கிரீனில் 'View' செய்து காட்டுகிறோம்
+                viewInvoice(newInvoiceData.billNo);
+            }
+
+            // டேபிளை ரெண்டர் செய்கிறோம்
+            renderInvoiceTable(savedInvoices);
+        });
+
+        // 3. டேபிளில் டேட்டாவை நிரப்பும் ஃபங்க்ஷன்
+        function renderInvoiceTable(invoices) {
+            const tableBody = document.getElementById("invoice-table-body");
+            if (!tableBody) return;
+
+            if (invoices.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-gray-400">No invoices generated yet!</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = invoices.map(inv => {
+                // மொத்த பொருட்களின் எண்ணிக்கை
+                const totalQty = inv.items.reduce((sum, item) => sum + item.quantity, 0);
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="p-4 font-bold text-blue-700">INV${inv.billNo}</td>
+                        <td class="p-4 font-semibold text-gray-800">${inv.customerName || 'Walk-in'}</td>
+                        <td class="p-4 text-xs text-gray-500">${inv.date.split(",")[0]}</td>
+                        <td class="p-4 text-center font-medium">${totalQty} Items</td>
+                        <td class="p-4 text-right font-bold text-gray-900">${inv.grandTotal}</td>
+                        <td class="p-4 text-center">
+                            <span class="px-2 py-1 rounded text-xs font-bold bg-gray-100 text-gray-700">${inv.paymentMode}</span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">Paid</span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex justify-center gap-2">
+                                <button onclick="viewInvoice('${inv.billNo}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-1 px-3 rounded text-xs transition">View</button>
+                                <button onclick="printInvoice('${inv.billNo}')" class="bg-green-50 hover:bg-green-100 text-green-700 font-bold py-1 px-3 rounded text-xs transition">Print</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 4. குறிப்பிட்ட ஒரு பில்லை வியூ செய்து காட்டும் ஃபங்க்ஷன்
+        function viewInvoice(billNo) {
+            let savedInvoices = JSON.parse(localStorage.getItem("all_invoices")) || [];
+            const inv = savedInvoices.find(i => String(i.billNo) === String(billNo));
+
+            if (!inv) return;
+
+            // பில் விவரங்களை செட் செய்தல்
+            document.getElementById("inv-id").innerText = `#INV${inv.billNo}`;
+            document.getElementById("inv-customer").innerText = inv.customerName || 'Walk-in Customer';
+            document.getElementById("inv-date").innerText = inv.date;
+            document.getElementById("inv-subtotal").innerText = inv.subtotal;
+            document.getElementById("inv-taxable").innerText = inv.taxable;
+            document.getElementById("inv-discount").innerText = inv.discountAmount;
+            document.getElementById("inv-total").innerText = inv.grandTotal;
+            document.getElementById("inv-payment").innerText = inv.paymentMode;
+
+            // CGST + SGST கூட்டுத்தொகை
+            const cgstVal = parseFloat(inv.cgst.replace("₹", "")) || 0;
+            const sgstVal = parseFloat(inv.sgst.replace("₹", "")) || 0;
+            document.getElementById("inv-gst-total").innerText = `₹${(cgstVal + sgstVal).toFixed(2)}`;
+
+            // பொருட்கள் பட்டியல்
+            const itemsBody = document.getElementById("inv-items-body");
+            itemsBody.innerHTML = inv.items.map(item => {
+                const itemSubtotal = item.price * item.quantity;
+                const itemTaxable = Math.max(0, itemSubtotal - (item.itemDiscount * item.quantity));
+                const itemGstAmount = itemTaxable * (item.gstRate / 100);
+                const finalItemPrice = itemTaxable + itemGstAmount;
+
+                return `
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 font-medium text-gray-800">${item.name}</td>
+                        <td class="py-3 text-center font-bold">${item.quantity}</td>
+                        <td class="py-3 text-right">₹${item.price.toFixed(2)}</td>
+                        <td class="py-3 text-center text-xs text-gray-400">${item.gstRate}%</td>
+                        <td class="py-3 text-right font-bold text-gray-900">₹${finalItemPrice.toFixed(2)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // பிரிவியூ பாக்ஸை காண்பிக்கிறோம்
+            const previewBox = document.getElementById("bill-preview-container");
+            previewBox.classList.remove("hidden");
+            previewBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 5. பில்லை மறைக்கும் ஃபங்க்ஷன்
+        function closeBillPreview() {
+            document.getElementById("bill-preview-container").classList.add("hidden");
+        }
+
+        // 6. பில்லை பிரிண்ட் எடுக்கும் ஃபங்க்ஷன்
+        function printInvoice(billNo) {
+            viewInvoice(billNo); // முதலில் டேட்டாவை லோடு செய்கிறோம்
+            setTimeout(() => {
+                window.print(); // பிறகு பிரிண்ட் விண்டோவை ஓபன் செய்கிறோம்
+            }, 300);
+        }
+    </script>
+</body>
+</html>

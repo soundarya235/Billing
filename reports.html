@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMart - Business Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans flex">
+
+    <aside class="w-64 bg-green-800 text-white flex flex-col shadow-xl fixed h-full z-10">
+        <div class="p-5 text-2xl font-bold border-b border-green-700 flex items-center gap-2">🛒 DMart ERP</div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.html" class="block py-2.5 px-4 rounded hover:bg-green-700 font-bold transition">Dashboard</a>
+            <a href="billing.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">POS Billing</a>
+            <a href="invoice.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Invoice History</a>
+            <a href="products.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Product Inventory</a>
+            
+            <a href="suppliers.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Suppliers List</a>
+            
+            <a href="reports.html" class="block py-2.5 px-4 rounded transition bg-green-900 opacity-75"> Analytics Reports</a>
+            <a href="settings.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
+        </nav>
+    </aside>
+
+    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        
+        <header class="bg-white p-4 shadow-sm border-b flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">📊 Business Analytics Reports (Table View)</h1>
+            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow">
+                🖨️ Print Report
+            </button>
+        </header>
+
+        <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Revenue (விற்பனை வருவாய்)</p>
+                        <h3 id="rep-total-revenue" class="text-3xl font-black text-gray-950 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg text-green-600 text-2xl">💰</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Invoices (மொத்த பில்கள்)</p>
+                        <h3 id="rep-total-bills" class="text-3xl font-black text-gray-950 mt-1">0</h3>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-lg text-blue-600 text-2xl">📄</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Items Sold (விற்ற பொருட்கள்)</p>
+                        <h3 id="rep-total-items" class="text-3xl font-black text-gray-950 mt-1">0 Nos</h3>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded-lg text-purple-600 text-2xl">📦</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b font-bold text-gray-700">
+                    💳 Payment Mode Collection Summary (பண பரிவர்த்தனை சுருக்கம்)
+                </div>
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-500 uppercase text-xs font-bold tracking-wider border-b">
+                            <th class="p-3">Payment Mode</th>
+                            <th class="p-3 text-right">Total Amount Collected</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 font-medium text-gray-700">
+                        <tr>
+                            <td class="p-3 flex items-center gap-2">💵 Cash</td>
+                            <td id="table-pay-cash" class="p-3 text-right font-bold text-gray-900">₹0.00</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 flex items-center gap-2">📱 UPI (GPay/PhonePe)</td>
+                            <td id="table-pay-upi" class="p-3 text-right font-bold text-gray-900">₹0.00</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 flex items-center gap-2">💳 Card</td>
+                            <td id="table-pay-card" class="p-3 text-right font-bold text-gray-900">₹0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b font-bold text-gray-700 flex justify-between items-center">
+                        <span>🔥 Top Selling Products </span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-500 uppercase text-xs tracking-wider border-b">
+                                    <th class="p-3">Product Name</th>
+                                    <th class="p-3 text-center">Qty Sold</th>
+                                    <th class="p-3 text-right">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-products-body" class="divide-y divide-gray-100 text-gray-700">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b font-bold text-gray-700">
+                        <span>📋 Recent Transactions Summary (Recent Bill)</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-500 uppercase text-xs tracking-wider border-b">
+                                    <th class="p-3">Invoice</th>
+                                    <th class="p-3">Customer</th>
+                                    <th class="p-3">Mode</th>
+                                    <th class="p-3 text-right">Grand Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-tx-body" class="divide-y divide-gray-100 text-gray-700">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b font-bold text-gray-700 flex justify-between items-center">
+                    <span>📅 Month-wise Sales Summary </span>
+                    <span class="text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded font-mono">Yearly Breakdown</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-500 uppercase text-xs font-bold tracking-wider border-b">
+                                <th class="p-3">Month & Year </th>
+                                <th class="p-3 text-center">Total Bills Count</th>
+                                <th class="p-3 text-right">Total Monthly Sales Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthly-sales-body" class="divide-y divide-gray-100 font-medium text-gray-700">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const invoices = JSON.parse(localStorage.getItem("all_invoices")) || [];
+            calculateBusinessMetrics(invoices);
+        });
+
+        function calculateBusinessMetrics(invoices) {
+            let totalRevenue = 0;
+            let totalItemsQty = 0;
+            let paymentModes = { Cash: 0, UPI: 0, Card: 0 };
+            let productSalesMap = {};
+            let monthlySalesMap = {}; // 🆕 மாதக் கணக்கிற்கான புதிய ஆப்ஜெக்ட்
+
+            invoices.forEach(inv => {
+                const amt = parseFloat(inv.grandTotal.replace(/[^\d.-]/g, '')) || 0;
+                totalRevenue += amt;
+
+                // பேமெண்ட் மோட் கணக்கு
+                const mode = inv.paymentMode || "Cash";
+                if (paymentModes[mode] !== undefined) {
+                    paymentModes[mode] += amt;
+                } else {
+                    paymentModes["Cash"] += amt;
+                }
+
+                // விற்ற பொருட்கள் கணக்கு
+                if (inv.items && Array.isArray(inv.items)) {
+                    inv.items.forEach(item => {
+                        totalItemsQty += item.quantity;
+                        if (!productSalesMap[item.name]) {
+                            productSalesMap[item.name] = { qty: 0, rev: 0 };
+                        }
+                        productSalesMap[item.name].qty += item.quantity;
+                        productSalesMap[item.name].rev += (item.price * item.quantity);
+                    });
+                }
+
+                // 🆕 மாதாந்திர விற்பனையைப் பிரித்தெடுக்கும் லாஜிக்
+                if (inv.date) {
+                    // தேதியிலிருந்து மாதம் மற்றும் வருடத்தை மட்டும் எடுக்கிறோம் (Format: MM/YYYY or Month Name)
+                    const dateParts = inv.date.split(",")[0].split("/");
+                    if (dateParts.length >= 3) {
+                        // உங்கள் சிஸ்டம் தேதியின்படி (DD/MM/YYYY அல்லது MM/DD/YYYY) மாதப் பெயரைக் கண்டறிகிறது
+                        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                        
+                        // இந்திய சிஸ்டத்தில் பொதுவாக 2வது பகுதி மாதமாகவோ அல்லது 1வது பகுதி மாதமாகவோ இருக்கும். 
+                        // பாதுகாப்பிற்காக JS டேட் ஆப்ஜெக்ட் மூலம் மாதப் பெயரை எடுக்கிறோம்:
+                        const billDateObj = new Date(inv.date);
+                        const monthYearKey = !isNaN(billDateObj.getTime()) 
+                            ? `${monthNames[billDateObj.getMonth()]} ${billDateObj.getFullYear()}`
+                            : `Month (${dateParts[0]}/${dateParts[2]})`; // Date எரர் வந்தால் பேக்அப் கீ
+                        
+                        if (!monthlySalesMap[monthYearKey]) {
+                            monthlySalesMap[monthYearKey] = { count: 0, total: 0 };
+                        }
+                        monthlySalesMap[monthYearKey].count += 1;
+                        monthlySalesMap[monthYearKey].total += amt;
+                    }
+                }
+            });
+
+            // 1. KPI கார்டுகளில் எண்களை அப்டேட் செய்தல்
+            document.getElementById("rep-total-revenue").innerText = `₹${totalRevenue.toFixed(2)}`;
+            document.getElementById("rep-total-bills").innerText = invoices.length;
+            document.getElementById("rep-total-items").innerText = `${totalItemsQty} Nos`;
+
+            // 2. பேமெண்ட் டேபிளை நிரப்புதல்
+            document.getElementById("table-pay-cash").innerText = `₹${paymentModes.Cash.toFixed(2)}`;
+            document.getElementById("table-pay-upi").innerText = `₹${paymentModes.UPI.toFixed(2)}`;
+            document.getElementById("table-pay-card").innerText = `₹${paymentModes.Card.toFixed(2)}`;
+
+            // 3. அதிகம் விற்ற பொருட்கள் டேபிள்
+            const topProductsBody = document.getElementById("top-products-body");
+            const sortedProducts = Object.keys(productSalesMap).map(name => ({
+                name: name,
+                qty: productSalesMap[name].qty,
+                rev: productSalesMap[name].rev
+            })).sort((a, b) => b.qty - a.qty).slice(0, 5);
+
+            if (sortedProducts.length === 0) {
+                topProductsBody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-gray-400">No sales records yet!</td></tr>`;
+            } else {
+                topProductsBody.innerHTML = sortedProducts.map(p => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-semibold text-gray-800">🛍️ ${p.name}</td>
+                        <td class="p-3 text-center font-bold text-blue-600">${p.qty}</td>
+                        <td class="p-3 text-right font-mono font-bold text-gray-900">₹${p.rev.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // 4. சமீபத்திய 5 பரிவர்த்தனைகள் டேபிள்
+            const recentTxBody = document.getElementById("recent-tx-body");
+            const recentBills = invoices.slice(0, 5);
+
+            if (recentBills.length === 0) {
+                recentTxBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No recent transactions!</td></tr>`;
+            } else {
+                recentTxBody.innerHTML = recentBills.map(inv => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-mono font-bold text-xs text-blue-700">INV${inv.billNo}</td>
+                        <td class="p-3 text-gray-800 font-medium">${inv.customerName || 'Walk-in'}</td>
+                        <td class="p-3"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">${inv.paymentMode || 'Cash'}</span></td>
+                        <td class="p-3 text-right font-bold text-green-700">${inv.grandTotal}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // 🆕 5. மாதாந்திர விற்பனை டேபிளை நிரப்புதல்
+            const monthlySalesBody = document.getElementById("monthly-sales-body");
+            const monthsAvailable = Object.keys(monthlySalesMap);
+
+            if (monthsAvailable.length === 0) {
+                monthlySalesBody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">No monthly records found!</td></tr>`;
+            } else {
+                monthlySalesBody.innerHTML = monthsAvailable.map(monthKey => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-bold text-gray-800 flex items-center gap-1">📆 ${monthKey}</td>
+                        <td class="p-3 text-center text-gray-600 font-semibold">${monthlySalesMap[monthKey].count} Bills</td>
+                        <td class="p-3 text-right font-mono font-bold text-green-700">₹${monthlySalesMap[monthKey].total.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
