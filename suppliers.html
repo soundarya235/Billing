@@ -15,11 +15,9 @@
             <a href="billing.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">POS Billing</a>
             <a href="invoice.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Invoice History</a>
             <a href="products.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Product Inventory</a>
-            
-            <a href="suppliers.html" class="block py-2.5 px-4 rounded transition bg-green-900 opacity-75"> Suppliers List</a>
-            
-            <a href="reports.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Analytics Reports</a>
-            <a href="settings.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75"> Settings</a>
+            <a href="suppliers.html" class="block py-2.5 px-4 rounded transition bg-green-900 font-bold">Suppliers List</a>
+            <a href="reports.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Analytics Reports</a>
+            <a href="settings.html" class="block py-2.5 px-4 rounded transition hover:bg-green-700 opacity-75">Settings</a>
         </nav>
     </aside>
 
@@ -82,7 +80,7 @@
                             </tr>
                         </thead>
                         <tbody id="supplier-table-body" class="divide-y divide-gray-200 text-sm text-gray-700">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -90,8 +88,30 @@
         </main>
     </div>
 
+    <script src="Assets/js/storage.js"></script>
+    
     <script>
+        // ⚡ ட்ரைனர் ரிவியூவிற்கான சாம்பிள் சப்ளையர்கள் டேட்டாபேஸ்
+        // ⚡ 10 Real-Time Supermarket Suppliers Database
+const initialSuppliers = [
+    { id: "SUP-101", name: "Raja Grocery Wholesale", phone: "9876543210", category: "Groceries", address: "Koyambedu, Chennai" },
+    { id: "SUP-102", name: "Annam Dairy & Milk Foods", phone: "9443218765", category: "Dairy Products", address: "Mattuthavani, Madurai" },
+    { id: "SUP-103", name: "Lotus Cosmetics & Care Ltd", phone: "8877665544", category: "Cosmetics & Freshness", address: "RS Puram, Coimbatore" },
+    { id: "SUP-104", name: "Sri Krishna Sweets & Snacks", phone: "9944556677", category: "Snacks & Beverages", address: "Gandhipuram, Coimbatore" },
+    { id: "SUP-105", name: "Abirami Plastic & Packagings", phone: "9123456789", category: "Store Utilities", address: "Sivakasi" },
+    { id: "SUP-106", name: "Meenakshi Spices & Rice Mill", phone: "9500112233", category: "Grains & Spices", address: "Trichy Road, Salem" },
+    { id: "SUP-107", name: "Hindustan Unilever Distributor", phone: "7708899001", category: "FMCG & Soap", address: "Guindy, Chennai" },
+    { id: "SUP-108", name: "Kovai Fresh Fruit & Veg Agencies", phone: "9622334455", category: "Fruits & Vegetables", address: "Mettupalayam" },
+    { id: "SUP-109", name: "Cavinkare Personal Care", phone: "8122334455", category: "Cosmetics & Haircare", address: "Adyar, Chennai" },
+    { id: "SUP-110", name: "Britannia Biscuit Distributors", phone: "9003344556", category: "Snacks & Bakery", address: "KK Nagar, Trichy" }
+];
+
         document.addEventListener("DOMContentLoaded", () => {
+            // லோக்கல் ஸ்டோரேஜில் சப்ளையர் டேட்டா இல்லை எனில் சாம்பிள் டேட்டாவை ஏற்றுகிறது
+            if (!localStorage.getItem("all_suppliers")) {
+                localStorage.setItem("all_suppliers", JSON.stringify(initialSuppliers));
+            }
+
             refreshSupplierTable();
 
             // சப்ளையர் ஃபார்ம் சப்மிட் ஹேண்ட்லர்
@@ -126,9 +146,10 @@
                 return;
             }
 
-            // புதிய சப்ளையர் ஆப்ஜெக்ட்
+            // புதிய சப்ளையர் ஆப்ஜெக்ட் (முறையான ஐடி வரிசையுடன்)
+            const nextIdNum = suppliers.length > 0 ? parseInt(suppliers[0].id.split('-')[1]) + 1 : 104;
             const newSupplier = {
-                id: "SUP" + Math.floor(100 + Math.random() * 900),
+                id: `SUP-${nextIdNum}`,
                 name: name,
                 phone: phone,
                 category: category,
