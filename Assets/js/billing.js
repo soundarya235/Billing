@@ -180,7 +180,7 @@ window.changeQty = function(index, change) {
     if (item.quantity <= 0) {
         currentBillItems.splice(index, 1);
     } else if (item.quantity > originalProduct.stock) {
-        alert(`⚠️ ஸ்டாக்கில் ${originalProduct.stock} பொருட்கள் மட்டுமே உள்ளன.`);
+        alert(`⚠️ Only ${originalProduct.stock} items are in stock.`);
         item.quantity = originalProduct.stock;
     }
     updateBillUI();
@@ -193,7 +193,7 @@ window.deleteItem = function(index) {
 
 if (btnClear) {
     btnClear.addEventListener("click", () => {
-        if (confirm("பில் கார்ட்டை கா利 செய்யலாமா?")) {
+        if (confirm("Can  cancel bill card?")) {
             currentBillItems = [];
             updateBillUI();
         }
@@ -272,11 +272,11 @@ if (document.getElementById("interactive-reader")) {
 if (btnCheckout) {
     btnCheckout.addEventListener("click", () => {
         if (currentBillItems.length === 0) {
-            alert("⚠️ பில் கார்ட் காலியாக உள்ளது! பொருட்களை ஆட் செய்யவும்.");
+            alert("⚠️ Bill cart is empty! Add items.");
             return;
         }
 
-        if (!confirm("இந்த பில்லை முடித்து சேமிக்கலாமா?")) return;
+        if (!confirm("Can I pay this bill and save it?")) return;
 
         // 1. அசல் இன்வென்டரி லிஸ்டை எடுக்கிறோம்
         let allProducts = [];
@@ -333,7 +333,7 @@ if (btnCheckout) {
         // இப்போது போட்ட பில்லை மட்டும் தானாக ஓபன் செய்ய அதன் நம்பரை சேமிக்கிறோம்
         localStorage.setItem("latestInvoiceNo", generatedBillNo);
 
-        alert("🎉 பில் வெற்றிகரமாக சேமிக்கப்பட்டது! ஸ்டாக் குறைக்கப்பட்டது.");
+        alert("🎉 Bill saved successfully! Stock reduced.");
         
         // 7. 🚀 இன்வாய்ஸ் பக்கத்திற்கு ரீடைரெக்ட் செய்கிறோம்
         window.location.href = "invoice.html"; 

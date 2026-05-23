@@ -26,13 +26,23 @@ const initialProducts = [
 function getProducts() {
     let localData = localStorage.getItem('products');
     
-    // லோக்கல் ஸ்டோரேஜ் காலியாக இருந்தால் மட்டுமே இன்-பில்ட் டேட்டாவை லோடு செய்யும்
+    // 1. லோக்கல் ஸ்டோரேஜ் சுத்தமாக காலியாக இருந்தால்
     if (!localData) {
         localStorage.setItem('products', JSON.stringify(initialProducts));
         return initialProducts;
     }
     
-    return JSON.parse(localData);
+    let parsedData = JSON.parse(localData);
+    
+    // 2. 🚨 ட்ரைனர் சிஸ்டமிற்கான சேஃப்டி செக்: 
+    // ஒருவேளை டேட்டா இருந்து, ஆனால் அதில் 'name' அல்லது 'id' என்ற கீ (Key) மிஸ் ஆகியிருந்தால்
+    if (!parsedData || parsedData.length === 0 || parsedData[0].name === undefined) {
+        // பழைய தவறான மெமரியை அடியோடு அழித்துவிட்டு, அசல் 20 பொருட்களை லோடு செய்யும்
+        localStorage.setItem('products', JSON.stringify(initialProducts));
+        return initialProducts;
+    }
+    
+    return parsedData;
 }
 
 // புதிய தயாரிப்பைச் சேர்க்கும் ஃபங்க்ஷன்
