@@ -63,3 +63,7 @@ function addNewProduct(name, price, mfg, exp, stock, gst) {
     localStorage.setItem('products', JSON.stringify(products)); // சேமிக்கிறது
     return newProduct;
 }
+// Products save function
+function saveProducts(products) {
+    localStorage.setItem('products', JSON.stringify(products));
+}
